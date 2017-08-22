@@ -100,35 +100,50 @@
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
 
-    var arrSorted = array;
-    var result = [];
+    // var arrSorted = array;
+    // var result = [];
 
+    // if (!isSorted) {
+    //   arrSorted = array.sort();             
+    // }
+    // if ( iterator === undefined) {
+    //   _.each(arrSorted, function(item) {
+    //     if (!result.includes(item)) {
+    //       result.push(item);
+    //     }
+    //   }); 
+    // } else {
+    //   var newResult = [];
+    //   _.each(arrSorted, function(item) {
+    //     newResult.push(iterator(item));
+    //   });
+    //   var value = [];
+    //   var index = [];
+    //   _.each(newResult, function(item, i) {
+    //     if (!value.includes(item)) {
+    //       value.push(item);
+    //       index.push(i);
+    //     }
+    //   });
+    //   _.each(index, function(i) {
+    //     result.push(arrSorted[i]);
+    //   });
+    // }
+    // return result;
     if (!isSorted) {
-      arrSorted = array.sort();             
+      array = array.sort();             
     }
-    if ( iterator === undefined) {
-      _.each(arrSorted, function(item) {
-        if (!result.includes(item)) {
-          result.push(item);
-        }
-      }); 
-    } else {
-      var newResult = [];
-      _.each(arrSorted, function(item, i) {
-        newResult.push(iterator(item));
-      });
-      var value = [];
-      var index = [];
-      _.each(newResult, function(item, i) {
-        if (!value.includes(item)) {
-          value.push(item);
-          index.push(i);
-        }
-      });
-      _.each(index, function(i) {
-        result.push(arrSorted[i]);
-      });
-    }
+
+    var iterator = iterator || _.identity;
+    var iteratorResult = [];
+    var result = [];
+    
+    _.each(array, function(item) {
+      if (!iteratorResult.includes(iterator(item))) {
+        iteratorResult.push(iterator(item));
+        result.push(item);
+      }
+    });
     return result;
   };
 
@@ -186,6 +201,32 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    //if accumulator === undefined ===> var result
+    if (accumulator !== undefined) {
+      _.each(collection, function(item) {
+        accumulator = iterator(accumulator, item);
+      });
+      return accumulator;
+    } else {
+      if (Array.isArray(collection)) {
+        var accumulator = collection[0];
+        for (var i = 1; i < collection.length; i++) {
+          accumulator = iterator(accumulator, collection[i]);
+        }
+        return accumulator;
+      } else {
+        var accumulator = collection[Object.keys(collection)[0]];
+        for (var i = 1; i < collection.length; i++) {
+          accumulator = iterator(accumulator, collection[Object.keys(collection)[i]]);
+        }
+        return accumulator;
+      } 
+    }
+    //iterator start with collection[0]
+    
+    //if there is an accumulator
+    //iterator start with accumulator
+    //accumulator = iterator result
   };
 
   // Determine if the array or object contains a given value (using `===`).
